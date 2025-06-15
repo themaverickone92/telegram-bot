@@ -1,2 +1,12 @@
+functions-framework==3.*
 python-telegram-bot==20.7
-yandexcloud==0.227.0 
+python-json-logger
+yandexcloud==0.227.0
+ydb
+boto3
+pandas==2.1.4
+openpyxl==3.1.2
+requests==2.31.0
+python-dotenv==1.0.0
+aiohttp==3.9.1
+asyncio==3.4.3
