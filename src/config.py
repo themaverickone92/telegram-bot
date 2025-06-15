@@ -15,10 +15,16 @@ BOT_SECRET_ID = 'yf-oper-bot'     # Секрет с TELEGRAM_TOKEN
 sdk = SDK()
 
 def get_secret(secret_id: str) -> dict:
-    """Получение секрета из Yandex Cloud Secrets Manager"""
+    """Получение секрета из Yandex Cloud Lockbox"""
     try:
-        secret = sdk.secrets().get_secret(secret_id)
-        return secret.payload
+        lockbox = sdk.client('lockbox')
+        response = lockbox.get_secret(secret_id=secret_id)
+        payload = {}
+        # Берём значения из последней версии секрета
+        if response.secret.versions:
+            for entry in response.secret.versions[0].payload_entry:
+                payload[entry.key] = entry.text_value
+        return payload
     except Exception as e:
         print(f"Error getting secret {secret_id}: {e}")
         return {}
