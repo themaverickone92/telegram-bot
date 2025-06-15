@@ -46,18 +46,19 @@ pip install -r requirements.txt
      --subject serviceAccount:<service-account-id>
    ```
 
-   c. Создайте секрет с токеном бота:
+   c. Создайте секреты в Lockbox:
    ```bash
+   # Секрет с токеном бота
    yc secrets create --name yf-oper-bot --data TELEGRAM_TOKEN=your_bot_token
-   ```
 
-4. Настройте переменные окружения на VM:
-   ```bash
-   export YC_SERVICE_ACCOUNT_ID=<service-account-id>
-   export YC_KEY_ID=<key-id>
-   export YC_PRIVATE_KEY=<private-key>
-   export YD_ENDPOINT=<ydb-endpoint>
-   export YD_PATH=<ydb-path>
+   # Секрет с конфигурацией Yandex Cloud
+   yc secrets create --name yf-cloud-config --data '{
+     "YC_SERVICE_ACCOUNT_ID": "your-service-account-id",
+     "YC_KEY_ID": "your-key-id",
+     "YC_PRIVATE_KEY": "your-private-key",
+     "YD_ENDPOINT": "your-ydb-endpoint",
+     "YD_PATH": "your-ydb-path"
+   }'
    ```
 
 ## Деплой на Yandex Cloud VM
@@ -129,10 +130,12 @@ python src/main.py
 
 ## Безопасность
 
-- Токен бота и другие конфиденциальные данные хранятся в Yandex Cloud Secrets Manager
+- Все конфиденциальные данные хранятся в Yandex Cloud Secrets Manager (Lockbox):
+  - Токен Telegram бота
+  - Данные для доступа к Yandex Cloud
+  - Конфигурация Yandex Database
 - Доступ к операциям контролируется системой ролей
-- Все API ключи и конфиденциальные данные хранятся в Yandex Cloud Secrets Manager
-- Переменные окружения используются только для конфигурации Yandex Cloud
+- Бот использует сервисный аккаунт с минимально необходимыми правами
 
 ## Поддержка
 

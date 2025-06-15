@@ -7,26 +7,34 @@ import json
 load_dotenv()
 
 # Конфигурация Yandex Cloud
-YC_SERVICE_ACCOUNT_ID = os.getenv('YC_SERVICE_ACCOUNT_ID')
-YC_KEY_ID = os.getenv('YC_KEY_ID')
-YC_PRIVATE_KEY = os.getenv('YC_PRIVATE_KEY')
-YC_SECRET_ID = 'yf-oper-bot'  # ID секрета с токеном бота
+YC_SECRET_ID_BOT = 'yf-oper-bot'  # ID секрета с токеном бота
+YC_SECRET_ID_CONFIG = 'yf-cloud-config'  # ID секрета с конфигурацией
 
 # Инициализация SDK Yandex Cloud
 sdk = SDK()
 
-# Функция для получения токена бота из Yandex Cloud Secrets
-def get_telegram_token():
+def get_secret(secret_id: str) -> dict:
+    """Получение секрета из Yandex Cloud Secrets Manager"""
     try:
-        secret = sdk.secrets().get_secret(YC_SECRET_ID)
-        return secret.payload.get('TELEGRAM_TOKEN')
+        secret = sdk.secrets().get_secret(secret_id)
+        return secret.payload
     except Exception as e:
-        print(f"Error getting secret: {e}")
-        return None
+        print(f"Error getting secret {secret_id}: {e}")
+        return {}
 
-# Конфигурация базы данных
-YD_ENDPOINT = os.getenv('YD_ENDPOINT', 'grpcs://ydb.serverless.yandexcloud.net:2135')
-YD_PATH = os.getenv('YD_PATH', '/ru-central1/b1g2le4pdpq817dpt52a/etnvvemjslnivdcd9dt5')
+# Получаем конфигурацию из секретов
+bot_secret = get_secret(YC_SECRET_ID_BOT)
+cloud_config = get_secret(YC_SECRET_ID_CONFIG)
+
+# Токен бота
+BOT_TOKEN = bot_secret.get('TELEGRAM_TOKEN')
+
+# Конфигурация Yandex Cloud
+YC_SERVICE_ACCOUNT_ID = cloud_config.get('YC_SERVICE_ACCOUNT_ID')
+YC_KEY_ID = cloud_config.get('YC_KEY_ID')
+YC_PRIVATE_KEY = cloud_config.get('YC_PRIVATE_KEY')
+YD_ENDPOINT = cloud_config.get('YD_ENDPOINT')
+YD_PATH = cloud_config.get('YD_PATH')
 
 # API конфигурация
 OZON_API_KEY = os.getenv('OZON_API_KEY')

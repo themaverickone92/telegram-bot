@@ -2,7 +2,7 @@ import logging
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from config import (
-    get_telegram_token, MARKETPLACE_BUTTONS, OPERATION_BUTTONS, THREEPL_BUTTONS,
+    BOT_TOKEN, MARKETPLACE_BUTTONS, OPERATION_BUTTONS, THREEPL_BUTTONS,
     WELCOME_MESSAGE, IN_DEVELOPMENT_MESSAGE, UPLOAD_FILE_MESSAGE, SUCCESS_MESSAGE,
     ACCESS_DENIED_MESSAGE, USER_ROLES, ROLE_PERMISSIONS, ADMIN_IDS
 )
@@ -22,11 +22,10 @@ logger = logging.getLogger(__name__)
 class TelegramBot:
     def __init__(self):
         """Инициализация бота"""
-        self.token = get_telegram_token()
-        if not self.token:
+        if not BOT_TOKEN:
             raise ValueError("Не удалось получить токен бота из Yandex Cloud Secrets")
         
-        self.application = Application.builder().token(self.token).build()
+        self.application = Application.builder().token(BOT_TOKEN).build()
         self.db = Database()
         self.setup_handlers()
 
