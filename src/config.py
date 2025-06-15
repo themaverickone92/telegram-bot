@@ -1,7 +1,5 @@
 import os
 from dotenv import load_dotenv
-from yandexcloud import SDK
-import json
 
 # Загрузка переменных окружения (если нужно)
 load_dotenv()
@@ -11,50 +9,32 @@ YC_SECRET_ID = 'yc_key'           # Секрет с YC_SERVICE_ACCOUNT_ID, YC_KE
 YDB_SECRET_ID = 'yf-ydb-sec'      # Секрет с YD_ENDPOINT, YD_PATH
 BOT_SECRET_ID = 'yf-oper-bot'     # Секрет с TELEGRAM_TOKEN
 
-# Инициализация SDK Yandex Cloud
-sdk = SDK()
-
-def get_secret(secret_id: str) -> dict:
-    """Получение секрета из Yandex Cloud Lockbox"""
-    try:
-        lockbox = sdk.client('lockbox')
-        response = lockbox.get_secret(secret_id=secret_id)
-        payload = {}
-        # Берём значения из последней версии секрета
-        if response.secret.versions:
-            for entry in response.secret.versions[0].payload_entry:
-                payload[entry.key] = entry.text_value
-        return payload
-    except Exception as e:
-        print(f"Error getting secret {secret_id}: {e}")
-        return {}
-
 # Получаем значения из секретов
-yc_secret = get_secret(YC_SECRET_ID)
-ydb_secret = get_secret(YDB_SECRET_ID)
-bot_secret = get_secret(BOT_SECRET_ID)
-
-# Токен бота
-BOT_TOKEN = bot_secret.get('TELEGRAM_TOKEN')
-
-# Конфигурация Yandex Cloud
-YC_SERVICE_ACCOUNT_ID = yc_secret.get('YC_SERVICE_ACCOUNT_ID')
-YC_KEY_ID = yc_secret.get('YC_KEY_ID')
-YC_PRIVATE_KEY = yc_secret.get('YC_PRIVATE_KEY')
-
-# Конфигурация YDB
-YD_ENDPOINT = ydb_secret.get('YD_ENDPOINT')
-YD_PATH = ydb_secret.get('YD_PATH')
-
-# API конфигурация
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN')
+YC_SERVICE_ACCOUNT_ID = os.getenv('YC_SERVICE_ACCOUNT_ID')
+YC_KEY_ID = os.getenv('YC_KEY_ID')
+YC_PRIVATE_KEY = os.getenv('YC_PRIVATE_KEY')
+YD_ENDPOINT = os.getenv('YD_ENDPOINT')
+YD_PATH = os.getenv('YD_PATH')
 OZON_API_KEY = os.getenv('OZON_API_KEY')
 OZON_CLIENT_ID = os.getenv('OZON_CLIENT_ID')
+YANDEX_MARKET_TOKEN = os.getenv('YANDEX_MARKET_TOKEN')
+YANDEX_MARKET_CAMPAIGN_ID = os.getenv('YANDEX_MARKET_CAMPAIGN_ID')
+
+# Конфигурация Yandex Cloud
+YC_SERVICE_ACCOUNT_ID = YC_SERVICE_ACCOUNT_ID
+YC_KEY_ID = YC_KEY_ID
+YC_PRIVATE_KEY = YC_PRIVATE_KEY
+
+# Конфигурация YDB
+YD_ENDPOINT = YD_ENDPOINT
+YD_PATH = YD_PATH
+
+# API конфигурация
 OZON_API_URL = 'https://api-seller.ozon.ru/v1/cargoes/create'
 OZON_INFO_URL = 'https://api-seller.ozon.ru/v1/cargoes/create/info'
 
 # Яндекс Маркет API конфигурация
-YANDEX_MARKET_TOKEN = os.getenv('YANDEX_MARKET_TOKEN')
-YANDEX_MARKET_CAMPAIGN_ID = os.getenv('YANDEX_MARKET_CAMPAIGN_ID')
 YANDEX_MARKET_API_URL = 'https://api.partner.market.yandex.ru'
 
 # Константы для меню
