@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Проверка наличия необходимых переменных окружения
-if [ -z "$YC_SERVICE_ACCOUNT_ID" ] || [ -z "$YC_KEY_ID" ] || [ -z "$YC_PRIVATE_KEY" ]; then
-    echo "Error: Required environment variables are not set"
-    exit 1
-fi
-
 # Создание директории для проекта
 mkdir -p /opt/telegram-bot
 cd /opt/telegram-bot
@@ -19,15 +13,6 @@ source venv/bin/activate
 
 # Установка зависимостей
 pip install -r requirements.txt
-
-# Создание файла с переменными окружения
-cat > .env << EOL
-YC_SERVICE_ACCOUNT_ID=$YC_SERVICE_ACCOUNT_ID
-YC_KEY_ID=$YC_KEY_ID
-YC_PRIVATE_KEY=$YC_PRIVATE_KEY
-YD_ENDPOINT=$YD_ENDPOINT
-YD_PATH=$YD_PATH
-EOL
 
 # Создание systemd сервиса
 cat > /etc/systemd/system/telegram-bot.service << EOL
