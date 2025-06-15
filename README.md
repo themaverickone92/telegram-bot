@@ -15,15 +15,25 @@ cd yf_telegram_bot
 pip install -r requirements.txt
 ```
 
-3. Создайте файл `.env` на основе `.env.example`:
-```bash
-cp .env.example .env
-```
+3. Настройка Yandex Lockbox:
 
-4. Получите токен для вашего бота у [@BotFather](https://t.me/BotFather) в Telegram и добавьте его в файл `.env`:
-```
-TELEGRAM_TOKEN=your_telegram_bot_token_here
-```
+   a. Создайте секрет в Yandex Lockbox:
+   - Откройте консоль Yandex Cloud
+   - Перейдите в сервис Lockbox
+   - Создайте новый секрет
+   - Добавьте ключ `TELEGRAM_TOKEN` со значением вашего токена бота
+   - Скопируйте ID секрета
+
+   b. Получение ID секрета:
+   - При деплое в Yandex Cloud VM можно получить ID секрета из метаданных инстанса
+   - Или передать ID секрета через переменные окружения при деплое
+   - В коде замените `your-secret-id` на реальный ID секрета
+
+4. Настройте сервисный аккаунт:
+   - Создайте сервисный аккаунт в Yandex Cloud
+   - Назначьте ему роль `lockbox.payloadViewer`
+   - Создайте авторизованный ключ для сервисного аккаунта
+   - Сохраните ключ в файл `key.json`
 
 ## Запуск
 
@@ -41,3 +51,4 @@ python bot.py
 - Python 3.7+
 - python-telegram-bot
 - python-dotenv
+- yandexcloud

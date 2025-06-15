@@ -1,11 +1,8 @@
-import os
 import logging
-from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-
-# Load environment variables
-load_dotenv()
+from yandexcloud import SDK
+from yandexcloud.operation import OperationError
 
 # Enable logging
 logging.basicConfig(
@@ -14,8 +11,38 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Get the token from environment variable
-TOKEN = os.getenv('TELEGRAM_TOKEN')
+def get_config_from_lockbox():
+    """Get all configuration from Yandex Lockbox."""
+    try:
+        # Initialize SDK
+        sdk = SDK()
+        
+        # Get Lockbox service
+        lockbox_service = sdk.client(LockboxServiceClient)
+        
+        # Get secret payload
+        # В реальном приложении ID секрета можно получить из метаданных инстанса
+        # или передавать через переменные окружения при деплое
+        secret_id = "your-secret-id"  # Замените на реальный ID секрета
+        response = lockbox_service.get_payload(secret_id=secret_id)
+        
+        # Создаем словарь с конфигурацией
+        config = {}
+        for entry in response.entries:
+            config[entry.key] = entry.text_value
+                
+        if "TELEGRAM_TOKEN" not in config:
+            raise ValueError("TELEGRAM_TOKEN not found in Lockbox secret")
+            
+        return config
+        
+    except Exception as e:
+        logger.error(f"Error getting configuration from Lockbox: {e}")
+        raise
+
+# Get configuration from Lockbox
+config = get_config_from_lockbox()
+TOKEN = config["TELEGRAM_TOKEN"]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a welcome message when the command /start is issued."""
