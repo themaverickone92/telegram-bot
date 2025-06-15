@@ -32,19 +32,33 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Создайте файл `.env` с необходимыми переменными окружения:
-```env
-YC_SERVICE_ACCOUNT_ID=your_service_account_id
-YC_KEY_ID=your_key_id
-YC_PRIVATE_KEY=your_private_key
-YD_ENDPOINT=your_ydb_endpoint
-YD_PATH=your_ydb_path
-```
+3. Настройте Yandex Cloud Secrets Manager:
 
-4. Создайте секрет в Yandex Cloud Secrets Manager с токеном бота:
-```bash
-yc secrets create --name yf-oper-bot --data TELEGRAM_TOKEN=your_bot_token
-```
+   a. Создайте сервисный аккаунт в Yandex Cloud:
+   ```bash
+   yc iam service-account create --name telegram-bot-sa
+   ```
+
+   b. Назначьте роли сервисному аккаунту:
+   ```bash
+   yc resource-manager folders add-access-binding default \
+     --role secretmanager.secrets.versionAdder \
+     --subject serviceAccount:<service-account-id>
+   ```
+
+   c. Создайте секрет с токеном бота:
+   ```bash
+   yc secrets create --name yf-oper-bot --data TELEGRAM_TOKEN=your_bot_token
+   ```
+
+4. Настройте переменные окружения на VM:
+   ```bash
+   export YC_SERVICE_ACCOUNT_ID=<service-account-id>
+   export YC_KEY_ID=<key-id>
+   export YC_PRIVATE_KEY=<private-key>
+   export YD_ENDPOINT=<ydb-endpoint>
+   export YD_PATH=<ydb-path>
+   ```
 
 ## Деплой на Yandex Cloud VM
 
@@ -115,9 +129,10 @@ python src/main.py
 
 ## Безопасность
 
-- Токен бота хранится в Yandex Cloud Secrets Manager
+- Токен бота и другие конфиденциальные данные хранятся в Yandex Cloud Secrets Manager
 - Доступ к операциям контролируется системой ролей
-- Все API ключи хранятся в переменных окружения
+- Все API ключи и конфиденциальные данные хранятся в Yandex Cloud Secrets Manager
+- Переменные окружения используются только для конфигурации Yandex Cloud
 
 ## Поддержка
 
